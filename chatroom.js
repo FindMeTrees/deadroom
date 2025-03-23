@@ -58,3 +58,5 @@ socket.on("loadMessages", (messages) => {
 socket.on("clearChat", () => {
     document.getElementById("messageList").innerHTML = ""; // Clear chat messages
 });
+
+const socket = io("https://deadroom.onrender.com");
