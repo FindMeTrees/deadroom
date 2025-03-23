@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
+const path = require('path'); // Import path module
 
 const app = express();
 const server = http.createServer(app);
@@ -12,26 +13,22 @@ const io = socketIo(server, {
     }
 });
 
-let messages = []; // Store messages temporarily (use a database for persistence)
+let messages = []; // Store messages temporarily
 
 io.on('connection', (socket) => {
     console.log('A user connected');
 
-    // Send existing messages to new users
     socket.emit('loadMessages', messages);
 
-    // Receive and broadcast new messages
     socket.on('sendMessage', (data) => {
-        console.log("Message received:", data);
         messages.push(data);
         io.emit('receiveMessage', data);
     });
 
-    // Handle /clear command
     socket.on('clearChat', () => {
         console.log("Chat cleared by user");
-        messages = []; // Clear messages in memory
-        io.emit("clearChat"); // Notify all clients to clear their messages
+        messages = [];
+        io.emit("clearChat");
     });
 
     socket.on('disconnect', () => {
@@ -39,4 +36,13 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(3000, () => console.log('Server running on port 3000'));
+// ✅ Serve static frontend files (chatroom.html, CSS, JS, etc.)
+app.use(express.static(path.join(__dirname, "public")));
+
+// ✅ Redirect all routes to chatroom.html
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "chatroom.html"));
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
