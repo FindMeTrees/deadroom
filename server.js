@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
-const path = require('path'); // Import path module
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -36,10 +36,10 @@ io.on('connection', (socket) => {
     });
 });
 
-// ✅ Serve static frontend files (chatroom.html, CSS, JS, etc.)
+// ✅ Serve static frontend files from "public/" folder
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ Redirect all routes to chatroom.html
+// ✅ Redirect all other routes to chatroom.html
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "chatroom.html"));
 });
